@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    
+    <!-- CRITICAL: this redirect script MUST remain above the CSP meta tag to work -->
+    <script>
+      if (
+        window.location.protocol === 'http:' && 
+        window.location.hostname !== 'localhost' && 
+        window.location.hostname !== '127.0.0.1'
+      ) {
+        window.location.replace(window.location.href.replace(/^http:/, 'https:'));
+      }
+    </script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; default-src 'self'; script-src 'self' 'unsafe-inline' https://cgyroimzmhlrgnfimwen.supabase.co; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self' https://fonts.gstatic.com data:; media-src 'self' https://cgyroimzmhlrgnfimwen.supabase.co; connect-src 'self' https://cgyroimzmhlrgnfimwen.supabase.co wss://cgyroimzmhlrgnfimwen.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; worker-src 'self';" />
+    
+    <!-- Title & Description -->
+    <title>BeatStory — Historias que suenan.</title>
+    <meta name="description" content="La IA pone el sonido. Tú pones el motivo. Comparte música generada por IA y el contexto humano detrás." />
+    <meta name="keywords" content="música, historias, IA, suno, comunidad, compartir" />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="BeatStory — Historias que suenan." />
+    <meta property="og:description" content="La IA pone el sonido. Tú pones el motivo. Comparte música generada por IA y el contexto humano detrás." />
+    <meta property="og:url" content="https://detrasdelbeat.com/" />
+    <meta property="og:image" content="https://detrasdelbeat.com/og-image.png" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BeatStory — Historias que suenan." />
+    <meta name="twitter:description" content="La IA pone el sonido. Tú pones el motivo." />
+    <meta name="twitter:image" content="https://detrasdelbeat.com/twitter-image.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://detrasdelbeat.com/" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#000000" />
+
+    <!-- App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <link rel="preconnect" href="https://cgyroimzmhlrgnfimwen.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://cgyroimzmhlrgnfimwen.supabase.co" />
+  </head>
+  <body>
+    <!-- No-script fallback -->
+    <noscript>Necesitas tener JavaScript habilitado para usar esta aplicación.</noscript>
+    
+    <!-- Root element for React -->
+    <div id="root"></div>
+    
+    <!-- Main app script -->
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

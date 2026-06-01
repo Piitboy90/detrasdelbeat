@@ -1,0 +1,21 @@
+{
+  "name": "BeatStory — Historias que suenan",
+  "short_name": "BeatStory",
+  "description": "La IA pone el sonido. Tú pones el motivo. Comparte música generada por IA y el contexto humano detrás.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/vite.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
