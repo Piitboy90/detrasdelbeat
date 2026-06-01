@@ -11,7 +11,8 @@ function BellIcon() {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) return;
+    const userId = user?.id;
+    if (!userId) return;
 
     let mounted = true;
 
@@ -20,9 +21,9 @@ function BellIcon() {
         const { count, error } = await supabase
           .from('notifications')
           .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
+          .eq('user_id', userId)
           .eq('is_read', false);
-        
+
         if (error) throw error;
         if (mounted) setUnreadCount(count || 0);
       } catch (err) {
@@ -33,10 +34,13 @@ function BellIcon() {
 
     fetchNotifications();
 
+    // Nombre de canal unico por montaje para evitar el error
+    // "cannot add postgres_changes callbacks after subscribe()" que ocurre
+    // cuando supabase-js reusa una instancia de canal todavia subscrita.
     const channel = supabase
-      .channel(`public:notifications:user:${user.id}`)
-      .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+      .channel(`notifications-${userId}-${Date.now()}`)
+      .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` },
         (payload) => {
           if (mounted) setUnreadCount(prev => prev + 1);
         }
@@ -47,7 +51,7 @@ function BellIcon() {
       mounted = false;
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id]);
 
   return (
     <Link to="/buzon" className="relative p-2 text-gray-400 hover:text-[#FF8C42] transition-colors rounded-full hover:bg-white/5">
