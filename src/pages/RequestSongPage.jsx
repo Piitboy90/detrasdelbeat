@@ -31,6 +31,7 @@ function RequestSongPage() {
     story: '',
     musicStyle: '',
     customMusicStyle: '',
+    anonName: '', // solo se usa cuando no hay user
   });
   
   const [checks, setChecks] = useState([false, false, false]);
@@ -73,20 +74,10 @@ function RequestSongPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const { data: { user: currentUser } } = await supabase.auth.getUser();
 
-    if (!currentUser) {
-      toast({
-         title: "Debes iniciar sesión",
-         description: "Para enviar una solicitud, necesitamos saber quién eres.",
-         variant: "destructive"
-      });
-      saveDraft(formData);
-      navigate('/login');
-      return;
-    }
-
+    // Validaciones comunes
     if (!formData.motive || !formData.story || !formData.musicStyle) {
       toast({
         title: "Faltan datos",
@@ -100,6 +91,17 @@ function RequestSongPage() {
       toast({
         title: "Especifica el estilo",
         description: "Por favor escribe el estilo musical deseado.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Para anon exigimos un nombre (1-60 caracteres)
+    const trimmedAnonName = (formData.anonName || '').trim();
+    if (!currentUser && (trimmedAnonName.length < 1 || trimmedAnonName.length > 60)) {
+      toast({
+        title: "Nombre requerido",
+        description: "Escribe tu nombre (1-60 caracteres) para poder mencionarte en la canción.",
         variant: "destructive"
       });
       return;
@@ -119,41 +121,48 @@ function RequestSongPage() {
     setSubmitting(true);
     try {
       const finalMusicStyle = formData.musicStyle === 'Otro' ? formData.customMusicStyle : formData.musicStyle;
-      
-      // Changed to insert into 'requests' table as per new requirements
+
+      const insertPayload = {
+        title: `Canción de ${formData.motive}`,
+        motive: formData.motive,
+        music_style: finalMusicStyle,
+        story_brief: formData.story,
+        description: formData.story,
+        status: 'received',
+        created_at: new Date(),
+        ...(currentUser
+          ? { user_id: currentUser.id }
+          : { user_id: null, anonymous_name: trimmedAnonName })
+      };
+
       const { error } = await supabase
         .from('requests')
-        .insert({
-          user_id: currentUser.id,
-          title: `Canción de ${formData.motive}`,
-          motive: formData.motive,
-          music_style: finalMusicStyle,
-          story_brief: formData.story, // Mapping story to story_brief
-          description: formData.story, // Also mapping to description to be safe
-          status: 'received',
-          created_at: new Date()
-        });
+        .insert(insertPayload);
 
       if (error) throw error;
-      
-      // Create notification
-      await supabase.from('notifications').insert({
-        user_id: currentUser.id,
-        type: 'request_received',
-        title: 'Tu solicitud fue recibida',
-        body: 'Estamos trabajando en tu canción. Te notificaremos cuando haya avances.',
-        link: '/mis-pedidos',
-        is_read: false
-      });
-      
+
+      // Notificaciones solo si hay user (los anon no tienen donde recibirlas)
+      if (currentUser) {
+        await supabase.from('notifications').insert({
+          user_id: currentUser.id,
+          type: 'request_received',
+          title: 'Tu solicitud fue recibida',
+          body: 'Estamos trabajando en tu canción. Te notificaremos cuando haya avances.',
+          link: '/mis-pedidos',
+          is_read: false
+        });
+      }
+
       clearDraft();
       toast({
         title: "Solicitud enviada ✅",
-        description: "Tu historia está en camino. Te avisaremos cuando empiece la magia.",
+        description: currentUser
+          ? "Tu historia está en camino. Te avisaremos cuando empiece la magia."
+          : "Tu historia está en camino. ¡Gracias por compartirla con nosotros!",
       });
-      
-      navigate('/mis-pedidos');
-      
+
+      navigate(currentUser ? '/mis-pedidos' : '/');
+
     } catch (error) {
       console.error('Submission Error:', error);
       toast({
@@ -187,22 +196,41 @@ function RequestSongPage() {
           </div>
 
           {!user && (
-            <div className="bg-[#1E293B] border border-[#FF8C42]/20 rounded-xl p-6 mb-8 text-center shadow-lg">
-              <Music2 className="w-10 h-10 text-[#FF8C42] mx-auto mb-3" />
-              <h3 className="text-white font-semibold mb-2">Inicia sesión para enviar</h3>
-              <p className="text-gray-400 text-sm mb-4">
-                Guarda tu borrador y conéctate para que podamos notificarte cuando tu canción esté lista.
-              </p>
-              <Button 
-                onClick={() => navigate('/login')}
-                className="bg-[#FF8C42] hover:bg-[#ff7a1f] text-white"
-              >
-                Iniciar sesión
-              </Button>
+            <div className="bg-[#1E293B] border border-[#FF8C42]/20 rounded-xl p-5 mb-8 shadow-lg">
+              <div className="flex items-start gap-3">
+                <Music2 className="w-6 h-6 text-[#FF8C42] flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-gray-300">
+                  Estás solicitando como <span className="font-semibold text-white">invitado</span>. Si quieres recibir notificaciones cuando tu canción esté lista,{' '}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/login')}
+                    className="text-[#FF8C42] hover:underline font-medium"
+                  >
+                    inicia sesión
+                  </button>{' '}
+                  o sigue como invitado y rellena el formulario.
+                </div>
+              </div>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-8 bg-[#1E293B]/50 backdrop-blur-sm p-6 sm:p-8 rounded-2xl border border-gray-800">
+
+            {/* 0. Nombre (solo invitados) */}
+            {!user && (
+              <div className="space-y-2">
+                <Label className="text-white text-base">¿Cómo te llamamos?</Label>
+                <Input
+                  value={formData.anonName}
+                  onChange={(e) => handleChange('anonName', e.target.value)}
+                  placeholder="Tu nombre o alias"
+                  maxLength={60}
+                  className="bg-[#0F172A] border-gray-700 text-white focus-visible-orange"
+                />
+                <p className="text-xs text-gray-500">Visible para el equipo de BeatStory que prepara tu canción.</p>
+              </div>
+            )}
+
             
             {/* 1. Motive */}
             <div className="space-y-3">

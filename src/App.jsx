@@ -84,14 +84,8 @@ function App() {
                 } 
               />
               
-              <Route 
-                path="post/:id" 
-                element={
-                  <ProtectedRoute>
-                    <PostDetailPage />
-                  </ProtectedRoute>
-                } 
-              />
+              {/* Public — anon puede ver y reproducir */}
+              <Route path="post/:id" element={<PostDetailPage />} />
               
               {/* Public Profile View */}
               <Route path="u/:username" element={<ProfilePage />} />
@@ -123,23 +117,9 @@ function App() {
                 } 
               />
 
-              {/* Requests Feature Routes */}
-              <Route 
-                path="solicitar" 
-                element={
-                  <ProtectedRoute>
-                    <RequestSongPage />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="request-song" 
-                element={
-                  <ProtectedRoute>
-                    <RequestSongPage />
-                  </ProtectedRoute>
-                } 
-              />
+              {/* Requests Feature Routes — public, anon puede solicitar */}
+              <Route path="solicitar" element={<RequestSongPage />} />
+              <Route path="request-song" element={<RequestSongPage />} />
               
               <Route 
                 path="mis-pedidos" 

@@ -13,8 +13,15 @@ export const commentsService = {
       if (commentsError) throw commentsError;
       if (!comments || comments.length === 0) return [];
 
-      // 2. Extract unique user IDs from comments
-      const userIds = [...new Set(comments.map(comment => comment.user_id))];
+      // 2. Extract unique user IDs from comments (descarta anon -> user_id NULL)
+      const userIds = [...new Set(
+        comments.map(c => c.user_id).filter(Boolean)
+      )];
+
+      // Si todos son anon, no hace falta query a profiles
+      if (userIds.length === 0) {
+        return comments.map(c => ({ ...c, profiles: null }));
+      }
 
       // 3. Fetch profiles for these users manually
       const { data: profiles, error: profilesError } = await supabase
@@ -49,9 +56,10 @@ export const commentsService = {
 
   async createComment(commentData) {
     try {
-      // Validate auth first
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) throw new Error('Usuario no autenticado');
+      // Las RLS de la BD se encargan de validar:
+      //  - Auth: auth.uid() === user_id y profile no baneado
+      //  - Anon: user_id NULL y anonymous_name presente
+      // No bloqueamos por sesion aqui para soportar comentarios anonimos.
 
       // 1. Insert the comment
       const { data: comment, error: commentError } = await supabase
@@ -62,14 +70,18 @@ export const commentsService = {
 
       if (commentError) throw commentError;
 
-      // 2. Fetch the user's profile manually to return with the comment
-      const { data: profile, error: profileError } = await supabase
+      // 2. Si es anonimo no hay profile que adjuntar
+      if (!commentData.user_id) {
+        return { ...comment, profiles: null };
+      }
+
+      // 3. Para autenticados, traemos el profile para mostrarlo enseguida
+      const { data: profile } = await supabase
         .from('profiles')
         .select('username, avatar_url')
         .eq('user_id', commentData.user_id)
         .single();
 
-      // Return comment with profile (or null if not found/error)
       return {
         ...comment,
         profiles: profile || null

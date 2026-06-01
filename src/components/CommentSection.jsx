@@ -17,9 +17,10 @@ function CommentSection({ postId }) {
   const { toast } = useToast();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [anonName, setAnonName] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  
+
   const [deleteId, setDeleteId] = useState(null);
   const [reportId, setReportId] = useState(null);
 
@@ -52,15 +53,33 @@ function CommentSection({ postId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newComment.trim() || !user) return;
+    if (!newComment.trim()) return;
+
+    // Para anon exigimos un nombre (entre 1 y 30 chars)
+    const trimmedName = anonName.trim();
+    if (!user && (trimmedName.length < 1 || trimmedName.length > 30)) {
+      toast({
+        title: "Nombre requerido",
+        description: "Escribe un nombre (1-30 caracteres) para firmar tu comentario.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setSubmitting(true);
     try {
-      const commentData = {
-        post_id: postId,
-        user_id: user.id,
-        content: newComment.trim()
-      };
+      const commentData = user
+        ? {
+            post_id: postId,
+            user_id: user.id,
+            content: newComment.trim()
+          }
+        : {
+            post_id: postId,
+            user_id: null,
+            anonymous_name: trimmedName,
+            content: newComment.trim()
+          };
       const createdComment = await commentsService.createComment(commentData);
       setComments([createdComment, ...comments]);
       setNewComment('');
@@ -119,13 +138,39 @@ function CommentSection({ postId }) {
            </form>
         </div>
       ) : (
-        <div className="bg-[#0F172A] p-6 rounded-xl text-center mb-10 border border-dashed border-gray-700">
-           <p className="text-gray-400 mb-3">Únete a la conversación</p>
-           <Link to="/login">
-             <Button variant="outline" className="border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800">
-               Iniciar Sesión para comentar
-             </Button>
-           </Link>
+        <div className="flex gap-4 mb-10">
+           <div className="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-gray-300 font-bold text-sm shadow-md">
+              {(anonName.trim().charAt(0) || '?').toUpperCase()}
+           </div>
+           <form onSubmit={handleSubmit} className="flex-grow flex flex-col gap-2">
+              <input
+                type="text"
+                value={anonName}
+                onChange={(e) => setAnonName(e.target.value)}
+                placeholder="Tu nombre (visible)"
+                maxLength={30}
+                className="w-full bg-[#0F172A] border border-gray-700 rounded-xl px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35] text-sm"
+              />
+              <div className="relative">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Comparte tu pensamiento..."
+                  className="w-full bg-[#0F172A] border border-gray-700 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35] resize-none h-24 transition-all text-sm md:text-base"
+                />
+                <Button
+                  type="submit"
+                  disabled={submitting || !newComment.trim() || !anonName.trim()}
+                  size="sm"
+                  className="absolute bottom-3 right-3 bg-[#FF6B35] hover:bg-[#e05a2b] text-white rounded-lg h-8 px-3 disabled:opacity-50"
+                >
+                  {submitting ? '...' : <Send className="h-4 w-4" />}
+                </Button>
+              </div>
+              <p className="text-[11px] text-gray-500">
+                Comentando como invitado. <Link to="/login" className="text-[#FF6B35] hover:underline">Inicia sesión</Link> si quieres editar o borrar tus comentarios después.
+              </p>
+           </form>
         </div>
       )}
 
@@ -143,30 +188,38 @@ function CommentSection({ postId }) {
            />
         ) : (
            comments.map((comment, index) => {
-             const commenterUsername = comment.profiles?.username || 'Usuario desconocido';
-             
+             const isAnon = !comment.user_id;
+             const commenterUsername = isAnon
+               ? (comment.anonymous_name || 'Invitado')
+               : (comment.profiles?.username || 'Usuario desconocido');
+
+             // Anon: avatar y nombre no son enlaces (no hay /u/:username)
+             const AvatarWrapper = isAnon ? 'div' : Link;
+             const NameWrapper = isAnon ? 'span' : Link;
+             const wrapperProps = isAnon ? {} : { to: `/u/${commenterUsername}` };
+
              return (
              <div key={comment.id} className="animate-fade-in">
                 <div className="flex gap-4 group">
-                   <Link 
-                     to={`/u/${commenterUsername}`}
-                     className="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-1 ring-gray-600 hover:ring-[#FF6B35] transition-all"
+                   <AvatarWrapper
+                     {...wrapperProps}
+                     className={`w-10 h-10 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-1 ring-gray-600 ${isAnon ? '' : 'hover:ring-[#FF6B35]'} transition-all`}
                    >
-                      {comment.profiles?.avatar_url ? (
+                      {!isAnon && comment.profiles?.avatar_url ? (
                          <img src={comment.profiles.avatar_url} alt={commenterUsername} className="w-full h-full object-cover" />
                       ) : (
                          commenterUsername.charAt(0).toUpperCase()
                       )}
-                   </Link>
+                   </AvatarWrapper>
                    <div className="flex-grow">
                       <div className="flex justify-between items-start mb-1">
                          <div className="flex items-center gap-2">
-                            <Link 
-                               to={`/u/${commenterUsername}`}
-                               className="font-semibold text-white text-sm md:text-base hover:text-[#FF6B35] transition-colors"
+                            <NameWrapper
+                               {...wrapperProps}
+                               className={`font-semibold text-white text-sm md:text-base ${isAnon ? '' : 'hover:text-[#FF6B35]'} transition-colors`}
                             >
-                              {commenterUsername}
-                            </Link>
+                              {commenterUsername}{isAnon && <span className="ml-1.5 text-[10px] uppercase tracking-wider text-gray-500 font-normal">Invitado</span>}
+                            </NameWrapper>
                             <span className="text-xs text-gray-500">• {formatTimeAgo(comment.created_at)}</span>
                          </div>
                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
