@@ -96,12 +96,28 @@ function HomePage() {
       <div>
         <div className="hero-seam-fix relative flex flex-col justify-center overflow-hidden min-h-[85vh] bg-black">
           <div className="absolute inset-0 z-0">
-             <img 
-               src={toHttps("https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2000&auto=format&fit=crop")} 
-               alt="BeatStory Hero" 
-               className="w-full h-full object-cover opacity-60"
+             {/* Video loop premium. Si el usuario tiene prefers-reduced-motion,
+                 el CSS lo oculta y deja solo el poster (mismo encuadre). */}
+             <video
+               className="hero-video w-full h-full object-cover opacity-60"
+               src="/hero.mp4"
+               poster={toHttps("https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2000&auto=format&fit=crop")}
+               autoPlay
+               loop
+               muted
+               playsInline
+               preload="metadata"
+               disablePictureInPicture
+               aria-hidden="true"
              />
-             <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-black/40 to-black/60" /> 
+             {/* Fallback estatico para usuarios con reduce-motion (controlado por CSS) */}
+             <img
+               className="hero-poster absolute inset-0 w-full h-full object-cover opacity-60"
+               src={toHttps("https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2000&auto=format&fit=crop")}
+               alt=""
+               aria-hidden="true"
+             />
+             <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-black/40 to-black/60" />
              <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
           </div>
 

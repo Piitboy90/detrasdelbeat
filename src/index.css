@@ -285,4 +285,14 @@
     border-color: rgba(255, 140, 0, 0.45);
     box-shadow: 0 0 20px var(--accent-glow);
   }
+
+  /* Hero: video loop + poster fallback.
+     Por defecto se ve el video y se esconde el poster.
+     Si el usuario pide reducir movimiento, se invierte. */
+  .hero-poster { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-video { display: none; }
+    .hero-poster { display: block; }
+  }
 }
