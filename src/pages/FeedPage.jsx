@@ -71,17 +71,18 @@ function FeedPage() {
       <div className="min-h-screen bg-[#0F172A] py-8 px-4 sm:px-6 lg:px-8 pb-32">
         <div className="max-w-7xl mx-auto space-y-8">
           
-          {/* Header & Controls - Compact Version */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 border-b border-gray-800 pb-6">
-            
+          {/* Header & Controls - sticky bajo el navbar */}
+          <div className="sticky top-16 z-40 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 border-b border-[var(--accent-soft)] py-4 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 bg-[rgba(15,23,42,0.82)] backdrop-blur-md supports-[backdrop-filter]:bg-[rgba(15,23,42,0.6)]">
+
             <div className="w-full md:w-auto flex-1 max-w-2xl">
                <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#FF8C42] transition-colors h-5 w-5" />
-                  <Input 
-                    placeholder="Buscar por título, historia, género..." 
-                    className="pl-12 bg-[#1E293B] border-gray-700 text-white focus-visible-orange h-12 rounded-full shadow-inner"
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#FF8C42] transition-colors h-5 w-5 pointer-events-none" />
+                  <Input
+                    placeholder="Buscar por título, historia, género..."
+                    className="pl-12 bg-[#1E293B] border-gray-700 text-white focus-visible-orange h-12 rounded-full shadow-inner text-base"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    aria-label="Buscar publicaciones"
                   />
                </div>
             </div>
@@ -129,8 +130,8 @@ function FeedPage() {
                         Destacado
                       </h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                         {radarPosts.map(post => (
-                           <PostCard key={post.id} post={post} />
+                         {radarPosts.map((post, index) => (
+                           <PostCard key={post.id} post={post} index={index} />
                          ))}
                          {/* Removed 'Tu historia aqui' block per requirements */}
                       </div>
@@ -144,10 +145,10 @@ function FeedPage() {
                 <section>
                    <h2 className="text-xl font-bold text-white mb-6 border-l-4 border-gray-600 pl-4">{hasFilters ? `Resultados (${filteredPosts.length})` : "Descubrimientos Recientes"}</h2>
                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {hasFilters ? filteredPosts.map(post => (
-                        <PostCard key={post.id} post={post} />
-                      )) : restPosts.map(post => (
-                        <PostCard key={post.id} post={post} />
+                      {hasFilters ? filteredPosts.map((post, index) => (
+                        <PostCard key={post.id} post={post} index={index} />
+                      )) : restPosts.map((post, index) => (
+                        <PostCard key={post.id} post={post} index={index} />
                       ))}
                    </div>
                 </section>
