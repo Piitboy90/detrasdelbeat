@@ -53,8 +53,11 @@ function Footer() {
             </div>
           </div>
           
-          <div className="pt-8 border-t border-gray-800 text-center text-sm text-gray-500">
+          <div className="pt-8 border-t border-gray-800 text-center text-sm text-gray-500 space-y-1">
             <p>&copy; {new Date().getFullYear()} BeatStory. Todos los derechos reservados.</p>
+            <p className="text-gray-600">
+              Hecho con <span className="text-[#FF8C42]" aria-label="amor">♥</span> por <span className="text-gray-300 font-medium">Peter Siteng</span>
+            </p>
           </div>
         </div>
       </footer>

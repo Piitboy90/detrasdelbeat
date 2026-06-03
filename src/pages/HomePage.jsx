@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, Sparkles, Play } from 'lucide-react';
+import { ArrowRight, Play } from 'lucide-react';
 import { postsService } from '@/services/postsService';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import MicroRitual from '@/components/MicroRitual';
-import RadarBeatStory from '@/components/RadarBeatStory';
 import RequestsSongSection from '@/components/RequestsSongSection';
 import SessionsCarousel from '@/components/SessionsCarousel';
 import CoverArt from '@/components/CoverArt';
@@ -109,7 +108,7 @@ function HomePage() {
              {/* Mobile (< md): video loop premium. autoplay+muted+playsInline,
                  preload="metadata" para no penalizar conexiones lentas. */}
              <video
-               className="hero-video-mobile md:hidden absolute inset-0 w-full h-full object-cover opacity-60"
+               className="hero-video-mobile md:hidden absolute inset-0 w-full h-full object-cover opacity-90"
                src="/hero-mobile.mp4"
                poster="/hero-desktop.jpg"
                autoPlay
@@ -123,15 +122,18 @@ function HomePage() {
 
              {/* Fallback estatico para usuarios mobile con prefers-reduced-motion */}
              <img
-               className="hero-img-mobile-fallback hidden absolute inset-0 w-full h-full object-cover opacity-60"
+               className="hero-img-mobile-fallback hidden absolute inset-0 w-full h-full object-cover opacity-90"
                src="/hero-desktop.jpg"
                alt=""
                aria-hidden="true"
              />
 
-             {/* Overlays para mantener la legibilidad del copy */}
+             {/* Overlays para mantener la legibilidad del copy.
+                 Vertical sigue garantizando contraste bajo el CTA;
+                 horizontal aligerado (de black/80 a black/55) para dejar
+                 brillar mas el contenido visual. */}
              <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-black/40 to-black/60" />
-             <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
+             <div className="absolute inset-0 bg-gradient-to-r from-black/55 to-transparent" />
           </div>
 
           <motion.div 
@@ -152,19 +154,11 @@ function HomePage() {
                 </h2>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-8">
-                   <Button 
-                     onClick={() => navigate('/solicitar')}
+                   <Button
+                     onClick={() => navigate('/feed')}
                      className="bg-[#FF8C42] hover:bg-[#ff7a1f] text-white px-8 py-7 text-lg rounded-full shadow-[0_4px_20px_rgba(255,140,66,0.3)] hover:shadow-[0_6px_24px_rgba(255,140,66,0.4)] transition-all duration-300 group"
                    >
-                     Encargar mi canción <Sparkles className="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" />
-                   </Button>
-
-                   <Button 
-                     onClick={() => navigate('/feed')}
-                     variant="outline"
-                     className="border-white/20 text-white hover:bg-white/10 px-8 py-7 text-lg rounded-full backdrop-blur-sm transition-all duration-300"
-                   >
-                     Explorar historias
+                     Explorar historias <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                    </Button>
                 </div>
             </div>
@@ -249,18 +243,6 @@ function HomePage() {
             </div>
           </div>
         )}
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 relative z-10">
-           <motion.section 
-             initial={{ opacity: 0, y: 10 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true, margin: "-50px" }}
-             transition={{ duration: 0.4 }}
-           >
-              <SectionHeader title="Radar BeatStory" subtitle="Lo que suena esta semana en nuestra comunidad" />
-              <RadarBeatStory posts={data.recentPosts} />
-           </motion.section>
-        </div>
 
         <div className="bg-[#0F172A] py-6 md:py-10 border-t border-gray-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
