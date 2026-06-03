@@ -1,0 +1,21 @@
+## Pages
+- [- Perfil`)}](/profile): No description available
+- [| BeatStory](/postdetail): No description available
+- [Admin Solicitudes | BeatStory](/adminrequests): No description available
+- [BeatStory — Historias que suenan.](/home): La IA pone el sonido. Tú pones el motivo. Comparte música generada por IA y el contexto humano detrás.
+- [Detalle Solicitud | BeatStory Admin](/adminrequestdetail): No description available
+- [Editar Historia | BeatStory](/editpost): No description available
+- [Feed | BeatStory](/feed): No description available
+- [Historias Guardadas | BeatStory](/savedposts): No description available
+- [Mis Solicitudes | BeatStory](/myrequests): No description available
+- [Mis Solicitudes | BeatStory](/requests): No description available
+- [Normas y Licencias | BeatStory](/normas): Guía de convivencia y normas de uso de BeatStory.
+- [Publicar Historia | BeatStory](/createpost): No description available
+- [Sesiones | BeatStory](/sessions): Canciones creadas con IA, elegidas con intención. Sesiones de piitboy90.
+- [Solicitar Canción | BeatStory](/requestsong): No description available
+- [Untitled Page](/adminsolicitudes): No description available
+- [Untitled Page](/buzon): No description available
+- [Untitled Page](/login): No description available
+- [Untitled Page](/mispedidos): No description available
+- [Untitled Page](/register): No description available
+- [Untitled Page](/settingsprofile): No description available
