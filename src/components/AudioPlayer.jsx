@@ -17,8 +17,14 @@ const AudioPlayer = forwardRef(({ post, isCompact = false, onPlayStateChange, on
   const [isLoading, setIsLoading] = useState(true);
   const [audioUrl, setAudioUrl] = useState(null);
   const [error, setError] = useState(null);
-  
+  const [videoLoopFailed, setVideoLoopFailed] = useState(false);
+
   const internalAudioRef = useRef(null);
+  const videoLoopRef = useRef(null);
+
+  const coverUrl = toHttps(post.cover_url);
+  const videoLoopUrl = !videoLoopFailed ? toHttps(post.video_loop_url) : '';
+  const showTrackVisual = !!coverUrl;
 
   useImperativeHandle(ref, () => ({
     play: () => internalAudioRef.current?.play(),
@@ -38,6 +44,27 @@ const AudioPlayer = forwardRef(({ post, isCompact = false, onPlayStateChange, on
       onPlayStateChange(isPlaying);
     }
   }, [isPlaying, onPlayStateChange]);
+
+  // Sincronizar el video loop visual con el estado del audio.
+  // El video es decorativo: muted + loop + playsInline. No autoplay al cargar.
+  useEffect(() => {
+    const v = videoLoopRef.current;
+    if (!v || !videoLoopUrl) return;
+
+    if (isPlaying) {
+      const p = v.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => {
+          // El navegador bloqueo el play (ej. data saver). Cae a portada.
+          setVideoLoopFailed(true);
+        });
+      }
+    } else {
+      v.pause();
+      // Volver al inicio para que la proxima reproduccion sea desde 0
+      try { v.currentTime = 0; } catch (_) { /* algunos browsers tiran cuando metadata no esta lista */ }
+    }
+  }, [isPlaying, videoLoopUrl]);
 
   useEffect(() => {
     let mounted = true;
@@ -141,26 +168,63 @@ const AudioPlayer = forwardRef(({ post, isCompact = false, onPlayStateChange, on
   }
 
   return (
-    <div className={cn(
-      "relative overflow-hidden bg-[#050A16] border border-gray-800 flex flex-col justify-end group",
-      isCompact ? "h-full min-h-[160px]" : "rounded-2xl shadow-xl"
-    )}>
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0B1E3A] to-[#1E293B] opacity-50 z-0" />
-      <div className="absolute -right-10 -top-10 w-40 h-40 bg-[#FF8C42] rounded-full filter blur-[60px] opacity-10 z-0" />
+    <div className={cn("flex flex-col gap-4", isCompact ? "h-full" : "")}>
 
-      {audioUrl && (
-        <audio
-          ref={internalAudioRef}
-          src={audioUrl}
-          onTimeUpdate={handleTimeUpdate}
-          onEnded={handleEnded}
-          onPause={() => setIsPlaying(false)}
-          onPlay={() => setIsPlaying(true)}
-          onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || duration_sec)}
-        />
+      {/* TRACK VISUAL (encima del player). Solo si hay cover.
+          - Portada estatica por defecto.
+          - Al pulsar Play en el audio, fundimos al video loop silencioso.
+          - Si no hay video_loop_url, se queda la portada quieta. */}
+      {showTrackVisual && (
+        <div
+          className={cn("track-visual", isPlaying && videoLoopUrl ? "is-playing" : "")}
+          aria-hidden="true"
+        >
+          <img
+            className="track-visual__media track-visual__cover"
+            src={coverUrl}
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+          {videoLoopUrl && (
+            <video
+              ref={videoLoopRef}
+              className="track-visual__media track-visual__video"
+              src={videoLoopUrl}
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              disablePictureInPicture
+              onError={() => setVideoLoopFailed(true)}
+              aria-hidden="true"
+            />
+          )}
+          <div className="track-visual__overlay" />
+        </div>
       )}
 
-      <div className={cn("relative z-10 w-full p-4 md:p-6", isCompact ? "pb-4" : "pb-8")}>
+      {/* PLAYER (intacto: gradiente + boton play + slider) */}
+      <div className={cn(
+        "relative overflow-hidden bg-[#050A16] border border-gray-800 flex flex-col justify-end group",
+        isCompact ? "h-full min-h-[160px]" : "rounded-2xl shadow-xl"
+      )}>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0B1E3A] to-[#1E293B] opacity-50 z-0" />
+        <div className="absolute -right-10 -top-10 w-40 h-40 bg-[#FF8C42] rounded-full filter blur-[60px] opacity-10 z-0" />
+
+        {audioUrl && (
+          <audio
+            ref={internalAudioRef}
+            src={audioUrl}
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={handleEnded}
+            onPause={() => setIsPlaying(false)}
+            onPlay={() => setIsPlaying(true)}
+            onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || duration_sec)}
+          />
+        )}
+
+        <div className={cn("relative z-10 w-full p-4 md:p-6", isCompact ? "pb-4" : "pb-8")}>
          <div className="flex justify-between items-start mb-4">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FF8C42]/10 border border-[#FF8C42]/20 text-[#FF8C42] text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(255,140,66,0.1)]">
                <Music className="w-3 h-3" /> SoundShare Original
@@ -210,7 +274,8 @@ const AudioPlayer = forwardRef(({ post, isCompact = false, onPlayStateChange, on
                  className="cursor-pointer"
                />
             </div>
-         </div>
+          </div>
+        </div>
       </div>
     </div>
   );
