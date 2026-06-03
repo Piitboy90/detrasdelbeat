@@ -66,6 +66,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        space: ['Space Grotesk', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {

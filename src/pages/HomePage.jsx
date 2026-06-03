@@ -156,9 +156,9 @@ function HomePage() {
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-8">
                    <Button
                      onClick={() => navigate('/feed')}
-                     className="bg-[#FF8C42] hover:bg-[#ff7a1f] text-white px-8 py-7 text-lg rounded-full shadow-[0_4px_20px_rgba(255,140,66,0.3)] hover:shadow-[0_6px_24px_rgba(255,140,66,0.4)] transition-all duration-300 group"
+                     className="bg-[rgba(255,140,66,0.10)] hover:bg-[rgba(255,140,66,0.22)] backdrop-blur-md border-2 border-[#FF8C42]/55 hover:border-[#FF8C42] text-white px-10 py-5 rounded-full shadow-[0_0_22px_rgba(255,140,66,0.18),inset_0_0_16px_rgba(255,140,66,0.06)] hover:shadow-[0_0_38px_rgba(255,140,66,0.32),inset_0_0_22px_rgba(255,140,66,0.10)] transition-all duration-300 group font-space tracking-[0.18em] uppercase text-xs font-medium"
                    >
-                     Explorar historias <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                     Explorar historias <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
                    </Button>
                 </div>
             </div>
