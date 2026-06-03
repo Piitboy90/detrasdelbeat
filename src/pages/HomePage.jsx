@@ -96,12 +96,22 @@ function HomePage() {
       <div>
         <div className="hero-seam-fix relative flex flex-col justify-center overflow-hidden min-h-[85vh] bg-black">
           <div className="absolute inset-0 z-0">
-             {/* Video loop premium. Si el usuario tiene prefers-reduced-motion,
-                 el CSS lo oculta y deja solo el poster (mismo encuadre). */}
+             {/* Desktop (>= md): imagen estatica premium del estudio.
+                 Carga prioritaria, JPG progresivo 203 kB. */}
+             <img
+               className="hero-img-desktop hidden md:block absolute inset-0 w-full h-full object-cover opacity-70"
+               src="/hero-desktop.jpg"
+               alt="Estudio BeatStory: guitarras Les Paul y consola de mezcla con iluminacion calida"
+               fetchpriority="high"
+               decoding="async"
+             />
+
+             {/* Mobile (< md): video loop premium. autoplay+muted+playsInline,
+                 preload="metadata" para no penalizar conexiones lentas. */}
              <video
-               className="hero-video w-full h-full object-cover opacity-60"
-               src="/hero.mp4"
-               poster={toHttps("https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2000&auto=format&fit=crop")}
+               className="hero-video-mobile md:hidden absolute inset-0 w-full h-full object-cover opacity-60"
+               src="/hero-mobile.mp4"
+               poster="/hero-desktop.jpg"
                autoPlay
                loop
                muted
@@ -110,13 +120,16 @@ function HomePage() {
                disablePictureInPicture
                aria-hidden="true"
              />
-             {/* Fallback estatico para usuarios con reduce-motion (controlado por CSS) */}
+
+             {/* Fallback estatico para usuarios mobile con prefers-reduced-motion */}
              <img
-               className="hero-poster absolute inset-0 w-full h-full object-cover opacity-60"
-               src={toHttps("https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2000&auto=format&fit=crop")}
+               className="hero-img-mobile-fallback hidden absolute inset-0 w-full h-full object-cover opacity-60"
+               src="/hero-desktop.jpg"
                alt=""
                aria-hidden="true"
              />
+
+             {/* Overlays para mantener la legibilidad del copy */}
              <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-black/40 to-black/60" />
              <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
           </div>

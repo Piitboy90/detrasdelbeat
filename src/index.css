@@ -286,13 +286,13 @@
     box-shadow: 0 0 20px var(--accent-glow);
   }
 
-  /* Hero: video loop + poster fallback.
-     Por defecto se ve el video y se esconde el poster.
-     Si el usuario pide reducir movimiento, se invierte. */
-  .hero-poster { display: none; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero-video { display: none; }
-    .hero-poster { display: block; }
+  /* Hero responsive: imagen en desktop, video en mobile.
+     - .hero-img-desktop: visible solo >= md (Tailwind: hidden md:block).
+     - .hero-video-mobile: visible solo < md (Tailwind: md:hidden).
+     - .hero-img-mobile-fallback: oculto por defecto; aparece en mobile
+       cuando el usuario pide reducir movimiento. */
+  @media (prefers-reduced-motion: reduce) and (max-width: 767px) {
+    .hero-video-mobile { display: none !important; }
+    .hero-img-mobile-fallback { display: block !important; }
   }
 }
