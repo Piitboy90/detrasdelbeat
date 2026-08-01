@@ -2,6 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { pathToFileURL } from 'url';
 
 const CLEAN_CONTENT_REGEX = {
   comments: /\/\*[\s\S]*?\*\/|\/\/.*$/gm,
@@ -162,9 +163,12 @@ function main() {
       .filter(Boolean);
   }
 
+  // No es un error fatal: llms.txt es un extra, no debe tumbar el build.
+  // Antes se toleraba con un '|| true' en el script de npm, pero esa
+  // sintaxis solo funciona en Linux/macOS y rompia la compilacion en Windows.
   if (pages.length === 0) {
-    console.error('❌ No pages with Helmet components found!');
-    process.exit(1);
+    console.warn('AVISO: no se encontro ninguna pagina con Helmet; se omite llms.txt');
+    return;
   }
 
 
@@ -175,7 +179,10 @@ function main() {
   fs.writeFileSync(outputPath, llmsTxtContent, 'utf8');
 }
 
-const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+// pathToFileURL en vez de concatenar 'file://': en Windows las rutas son
+// C:\... y la comparacion directa nunca coincidia, asi que main() no
+// llegaba a ejecutarse y llms.txt no se regeneraba.
+const isMainModule = import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (isMainModule) {
   main();
