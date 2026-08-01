@@ -61,9 +61,15 @@
          script y el dominio viene dentro, por eso no hace falta data-domain.
          Requiere https://plausible.io en script-src y connect-src (ver CSP).
          NO se registran las paginas vistas a mano: el script ya parchea
-         history.pushState y popstate, que es como navega React Router. -->
+         history.pushState y popstate, que es como navega React Router.
+
+         OJO: cambiar el dominio del sitio en Plausible REGENERA este
+         identificador y desactiva el anterior, que pasa a devolver 404. Si
+         algun dia se cambia de dominio, hay que volver a copiar el snippet
+         del panel y actualizar la linea de abajo, o la web dejara de medir
+         en silencio. -->
     <!-- Privacy-friendly analytics by Plausible -->
-    <script async src="https://plausible.io/js/pa-YUdZ7Ed5Q6paX5tZQ1SRB.js"></script>
+    <script async src="https://plausible.io/js/pa-bOOTOv5iw9dcOOCQivJ8f.js"></script>
     <script>
       window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
       plausible.init()

@@ -21,4 +21,4 @@ Disallow: /mis-pedidos
 Disallow: /mis-solicitudes
 Disallow: /requests
 
-Sitemap: https://detrasdelbeat-production.up.railway.app/sitemap.xml
+Sitemap: https://detrasdelbeat.com/sitemap.xml
