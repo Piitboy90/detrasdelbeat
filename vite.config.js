@@ -282,7 +282,11 @@ export default defineConfig({
 	plugins: [
 		...(isDev ? [inlineEditPlugin(), editModeDevPlugin(), iframeRouteRestorationPlugin(), selectionModePlugin()] : []),
 		react(),
-		addTransformIndexHtml
+		// Los scripts de Horizons son diagnostico para el editor: mandan
+		// errores por postMessage a window.parent. En produccion no hay
+		// ventana padre que los escuche y solo exponen trazas de error, asi
+		// que se limitan a desarrollo igual que los cuatro plugins de arriba.
+		...(isDev ? [addTransformIndexHtml] : [])
 	],
 	server: {
 		cors: true,
