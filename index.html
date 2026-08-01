@@ -56,19 +56,17 @@
     <link rel="preconnect" href="https://cgyroimzmhlrgnfimwen.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://cgyroimzmhlrgnfimwen.supabase.co" />
 
-    <!-- Analitica: Plausible.
-         La variante tagged-events permite eventos personalizados y ya sigue
-         la navegacion de la SPA por su cuenta (parchea history.pushState),
-         asi que NO hay que registrar las paginas vistas a mano.
-         Requiere https://plausible.io en script-src y connect-src (ver CSP). -->
-    <script defer data-domain="detrasdelbeat.com" src="https://plausible.io/js/script.tagged-events.js"></script>
+    <!-- Analitica: Plausible. Snippet propio del sitio, copiado tal cual del
+         panel (Site Installation). El identificador va en el nombre del
+         script y el dominio viene dentro, por eso no hace falta data-domain.
+         Requiere https://plausible.io en script-src y connect-src (ver CSP).
+         NO se registran las paginas vistas a mano: el script ya parchea
+         history.pushState y popstate, que es como navega React Router. -->
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-YUdZ7Ed5Q6paX5tZQ1SRB.js"></script>
     <script>
-      // Cola de espera: permite llamar a plausible(...) antes de que el
-      // script haya terminado de cargar. Los eventos se guardan y se envian
-      // en cuanto esta listo, en vez de perderse.
-      window.plausible = window.plausible || function () {
-        (window.plausible.q = window.plausible.q || []).push(arguments);
-      };
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
     </script>
   </head>
   <body>
