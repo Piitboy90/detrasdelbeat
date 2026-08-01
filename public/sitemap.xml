@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
+  Generado por tools/generate-seo-files.js. No editar a mano:
+  se regenera en cada build a partir de VITE_SITE_URL.
+
   Solo rutas publicas verificadas en src/App.jsx.
-  Se excluyen /feed, /sesiones y /normas porque estan envueltas en
-  ProtectedRoute: para un rastreador anonimo redirigen a /login.
-  Las URLs de posts (/post/:id) se anadiran en una fase posterior.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>

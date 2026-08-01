@@ -1,3 +1,6 @@
+# Generado por tools/generate-seo-files.js. No editar a mano:
+# se regenera en cada build a partir de VITE_SITE_URL.
+
 User-agent: *
 Allow: /
 
