@@ -71,11 +71,23 @@ export const authService = {
     
     const message = typeof error === 'string' ? error : error.message || 'Unknown error';
 
+    // Network failures: the request never reached Supabase
+    if (
+      message.includes('Failed to fetch') ||
+      message.includes('NetworkError') ||
+      message.includes('ERR_NAME_NOT_RESOLVED') ||
+      message.includes('AuthRetryableFetchError')
+    ) {
+      return navigator.onLine
+        ? "No pudimos conectar con el servidor. Puede estar temporalmente caído; inténtalo de nuevo en unos minutos."
+        : "Parece que no tienes conexión a internet. Revísala e inténtalo de nuevo.";
+    }
+
     // Map specific errors
     if (message.includes('Invalid login credentials')) {
       return "Email o contraseña incorrectos. Prueba de nuevo o usa 'Olvidé mi contraseña'.";
     }
-    
+
     if (message.includes('Email not confirmed')) {
       return "Tu email no ha sido confirmado. Por favor revisa tu bandeja de entrada.";
     }
@@ -84,7 +96,12 @@ export const authService = {
       return "No existe una cuenta registrada con este correo electrónico.";
     }
 
-    // Default fallback
-    return message;
+    if (message.includes('rate limit') || message.includes('Too many requests')) {
+      return "Demasiados intentos seguidos. Espera un minuto antes de volver a probar.";
+    }
+
+    // Never leak raw technical messages to the user; keep them in the console for debugging
+    console.error('Unmapped auth error:', message);
+    return "Algo salió mal al procesar tu solicitud. Inténtalo de nuevo.";
   }
 };

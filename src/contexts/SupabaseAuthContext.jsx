@@ -48,9 +48,14 @@ export const SupabaseAuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    return { data, error };
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      return { data, error: error?.message ?? null };
+    } catch (err) {
+      // Network failures (DNS down, offline, paused project) are thrown, not returned
+      console.error('Login failed:', err);
+      return { data: null, error: err?.message ?? 'Unknown error' };
+    }
   };
 
   const logout = async () => {
@@ -59,11 +64,19 @@ export const SupabaseAuthProvider = ({ children }) => {
     setUser(null);
     setSession(null);
   };
-  
-  const signUp = async (email, password, options) => {
-    const { data, error } = await supabase.auth.signUp({ email, password, options });
-    if (error) throw error;
-    return { data, error };
+
+  const signup = async (email, password, username) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { username } },
+      });
+      return { data, error: error?.message ?? null };
+    } catch (err) {
+      console.error('Signup failed:', err);
+      return { data: null, error: err?.message ?? 'Unknown error' };
+    }
   };
 
   const value = useMemo(() => ({
@@ -72,7 +85,7 @@ export const SupabaseAuthProvider = ({ children }) => {
     loading,
     login,
     logout,
-    signUp,
+    signup,
   }), [user, session, loading]);
 
   return <SupabaseAuthContext.Provider value={value}>{children}</SupabaseAuthContext.Provider>;

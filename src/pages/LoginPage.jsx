@@ -63,27 +63,35 @@ function LoginPage() {
     }
 
     setIsLoading(true);
-    
-    const { error } = await login(trimmedEmail, trimmedPassword);
-    
-    setIsLoading(false);
 
-    if (error) {
-      const friendlyError = authService.getFriendlyErrorMessage(error);
-      
-      toast({
-        title: "No se pudo iniciar sesión",
-        description: friendlyError,
-        variant: "destructive",
-      });
-    } else {
+    try {
+      const { error } = await login(trimmedEmail, trimmedPassword);
+
+      if (error) {
+        toast({
+          title: "No se pudo iniciar sesión",
+          description: authService.getFriendlyErrorMessage(error),
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
         title: "¡Bienvenido!",
         description: "Has iniciado sesión exitosamente",
       });
-      
+
       // Explicitly redirect to HOME as requested
       navigate('/', { replace: true });
+    } catch (err) {
+      toast({
+        title: "No se pudo iniciar sesión",
+        description: authService.getFriendlyErrorMessage(err),
+        variant: "destructive",
+      });
+    } finally {
+      // Runs no matter what, so the button never stays stuck on "Iniciando sesión..."
+      setIsLoading(false);
     }
   };
 
