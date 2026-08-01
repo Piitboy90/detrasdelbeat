@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Solo rutas publicas verificadas en src/App.jsx.
+  Se excluyen /feed, /sesiones y /normas porque estan envueltas en
+  ProtectedRoute: para un rastreador anonimo redirigen a /login.
+  Las URLs de posts (/post/:id) se anadiran en una fase posterior.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://detrasdelbeat-production.up.railway.app/</loc>
+    <lastmod>2026-08-01</lastmod>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://detrasdelbeat-production.up.railway.app/solicitar</loc>
+    <lastmod>2026-08-01</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+</urlset>

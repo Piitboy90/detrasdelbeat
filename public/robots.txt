@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Zonas privadas o de administracion
+Disallow: /admin
+Disallow: /settings
+Disallow: /buzon
+Disallow: /profile
+Disallow: /create
+
+# Rutas que exigen sesion iniciada: para un rastreador anonimo
+# solo son un redirect a /login, no vale la pena rastrearlas
+Disallow: /feed
+Disallow: /normas
+Disallow: /sesiones
+Disallow: /saved
+Disallow: /mis-pedidos
+Disallow: /mis-solicitudes
+Disallow: /requests
+
+Sitemap: https://detrasdelbeat-production.up.railway.app/sitemap.xml
