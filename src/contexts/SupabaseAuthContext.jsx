@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import supabase from '@/lib/supabase';
+import { track } from '@/lib/analytics';
 
 const SupabaseAuthContext = createContext(undefined);
 
@@ -50,6 +51,8 @@ export const SupabaseAuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      // Solo cuando Supabase confirma la sesion, no al pulsar el boton.
+      if (!error && data?.session) track('login_ok');
       return { data, error: error?.message ?? null };
     } catch (err) {
       // Network failures (DNS down, offline, paused project) are thrown, not returned
@@ -72,6 +75,9 @@ export const SupabaseAuthProvider = ({ children }) => {
         password,
         options: { data: { username } },
       });
+      // data.user llega tanto si hay sesion inmediata como si queda
+      // pendiente de confirmar el email; en ambos casos el alta se creo.
+      if (!error && data?.user) track('registro_ok');
       return { data, error: error?.message ?? null };
     } catch (err) {
       console.error('Signup failed:', err);

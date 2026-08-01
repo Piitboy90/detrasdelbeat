@@ -7,6 +7,7 @@ import FallbackBlock from '@/components/FallbackBlock';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { toHttps } from '@/utils/urlSecurity.js';
+import { track } from '@/lib/analytics';
 
 const AudioPlayer = forwardRef(({ post, isCompact = false, onPlayStateChange, onAudioRef }, ref) => {
   const { media_type, audio_path, external_url, duration_sec, title } = post;
@@ -219,7 +220,13 @@ const AudioPlayer = forwardRef(({ post, isCompact = false, onPlayStateChange, on
             onTimeUpdate={handleTimeUpdate}
             onEnded={handleEnded}
             onPause={() => setIsPlaying(false)}
-            onPlay={() => setIsPlaying(true)}
+            onPlay={() => {
+              setIsPlaying(true);
+              // Se usa onPlay del propio <audio> y no el onClick del boton:
+              // asi solo cuenta cuando el navegador empieza a reproducir de
+              // verdad. Un clic que falla no es una escucha.
+              track('play_cancion', { id_post: post.id, ubicacion: 'post' });
+            }}
             onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || duration_sec)}
           />
         )}

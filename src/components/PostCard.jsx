@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 import { handleSupabaseError } from '@/lib/supabaseErrorHandler';
 import { toHttps } from '@/utils/urlSecurity.js';
+import { track, ubicacionActual } from '@/lib/analytics';
 
 function PostCard({ post, className, index = 0 }) {
   const { user } = useAuth();
@@ -131,7 +132,14 @@ function PostCard({ post, className, index = 0 }) {
         <button
           type="button"
           aria-label={`Reproducir ${post.title}`}
-          onClick={(e) => { e.stopPropagation(); goToDetail(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            // Este boton no reproduce: navega al detalle. Por eso es
+            // 'click_escuchar' y no 'play_cancion', que se reserva para la
+            // reproduccion real en AudioPlayer.
+            track('click_escuchar', { id_post: post.id, ubicacion: ubicacionActual() });
+            goToDetail();
+          }}
           className="play-button"
         >
           <Play className="w-5 h-5 fill-current ml-0.5" />

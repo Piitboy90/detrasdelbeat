@@ -13,6 +13,7 @@ import CoverArt from '@/components/CoverArt';
 import VoicesSection from '@/components/VoicesSection';
 import { handleSupabaseError } from '@/lib/supabaseErrorHandler';
 import { toHttps } from '@/utils/urlSecurity.js';
+import { track } from '@/lib/analytics';
 
 function HomePage() {
   const [data, setData] = useState({
@@ -214,8 +215,13 @@ function HomePage() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-6">
-                      <Button 
-                         onClick={() => navigate(`/post/${data.weeklyFeature.id}`)}
+                      <Button
+                         onClick={() => {
+                            // Navega al detalle, no reproduce: por eso es
+                            // 'click_escuchar' y no 'play_cancion'.
+                            track('click_escuchar', { id_post: data.weeklyFeature.id, ubicacion: 'home' });
+                            navigate(`/post/${data.weeklyFeature.id}`);
+                         }}
                          className="bg-[#FF8C42] hover:bg-[#ff7a1f] text-white px-6 md:px-8 py-5 md:py-6 rounded-full shadow-lg shadow-[#FF8C42]/20 w-full sm:w-auto"
                       >
                          <Play className="w-4 h-4 md:w-5 md:h-5 mr-2 fill-current" /> Escuchar

@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Sparkles, Music2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import NormasCheckbox from '@/components/NormasCheckbox';
+import { track } from '@/lib/analytics';
 
 const MOTIVES = [
   "Amor", "Perdón", "Motivación", "Cumpleaños", "Reflexión", "Crítica social", "Otro"
@@ -37,6 +38,10 @@ function RequestSongPage() {
   const [checks, setChecks] = useState([false, false, false]);
   const [showNormasError, setShowNormasError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    track('ver_solicitar');
+  }, []);
 
   useEffect(() => {
     const draft = getDraft();
@@ -140,6 +145,11 @@ function RequestSongPage() {
         .insert(insertPayload);
 
       if (error) throw error;
+
+      // La solicitud ya esta guardada en Supabase: esto si es una conversion.
+      // Va aqui y no en el onClick del boton, porque un envio que falla no
+      // es una conversion.
+      track('envio_solicitud');
 
       // Notificaciones solo si hay user (los anon no tienen donde recibirlas)
       if (currentUser) {
